@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { config } from 'config/config';
+import { config } from 'configs/config';
 import {
   loginDataInterface,
   registerDataInterface,
@@ -8,10 +8,10 @@ import {
 const authApi = {
   register: (
     data: registerDataInterface,
-  ) => axios.post(`${config.url}/auth/signup`, data),
+  ) => axios.post(`${config.url}/auth/register`, data),
   login: (
     data: loginDataInterface,
-  ) => axios.post(`${config.url}/auth/signin`, data),
+  ) => axios.post(`${config.url}/auth/login`, data),
   logout: () => axios.get(`${config.url}/auth/logout`),
 };
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import Router from 'router';
 import Layout from 'components/layout';
-import Navigation from 'components/navigation';
+import Header from './components/header';
 
 function App(): JSX.Element {
   return (
     <Layout>
-      <Navigation />
+      <Header />
       <Router />
     </Layout>
   );

@@ -12,8 +12,8 @@ function Router(): JSX.Element {
     <React.Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<LazyMain />} />
-        <Route path="/signin" element={<LazyLogin />} />
-        <Route path="/signup" element={<LazyRegister />} />
+        <Route path="/login" element={<LazyLogin />} />
+        <Route path="/register" element={<LazyRegister />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </React.Suspense>

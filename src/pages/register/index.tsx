@@ -4,15 +4,31 @@ import {
 import {
   Box,
   Button,
-  Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Input, VStack,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Link,
+  Text,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
 import InputPassword from 'components/inputPassword';
 import { registerDataInterface } from 'interfaces/auth.interfaces';
-import { useNavigate } from 'react-router-dom';
-import authApi from '../../api/auth.api';
+import { Link as ReachLink, Navigate, useNavigate } from 'react-router-dom';
+import authApi from 'services/api/auth.api';
+import { colors } from 'configs/colors';
+import { useCookies } from 'react-cookie';
 import registrationValidationSchema from './registrationValidationSchema';
+import { messages } from '../../configs/toastConfig';
+import { constants } from '../../configs/constants';
+import { expirationDate } from '../../helpers';
 
 function Register(): JSX.Element {
+  const toast = useToast();
+  const [cookies, setCookie] = useCookies([constants.cookieName]);
   const navigate = useNavigate();
   const initialValues: registerDataInterface = {
     username: '',
@@ -22,6 +38,9 @@ function Register(): JSX.Element {
     confirmEmail: '',
     rememberMe: false,
   };
+  if (cookies?.userData) {
+    return <Navigate to="/" />;
+  }
   return (
     <Flex align="center" justify="center">
       <Box>
@@ -32,11 +51,46 @@ function Register(): JSX.Element {
           onSubmit={(values, { resetForm }) => {
             authApi.register(values)
               .then((res) => {
+                const {
+                  data: {
+                    email,
+                    id,
+                    message,
+                    rememberMe,
+                    token,
+                    username,
+                  },
+                } = res;
+                setCookie(constants.cookieName, {
+                  email,
+                  id,
+                  rememberMe,
+                  token,
+                  username,
+                }, {
+                  path: '/',
+                  maxAge: 24 * 60 * 60 * 1000,
+                  expires: expirationDate(rememberMe),
+                });
+                toast({
+                  title: messages.register,
+                  description: message,
+                  status: 'success',
+                  duration: 9000,
+                  isClosable: true,
+                });
                 navigate('/', { replace: true });
                 resetForm();
               })
               .catch((err) => {
-                resetForm();
+                const { error } = err.response.data;
+                toast({
+                  title: messages.registerError,
+                  description: error,
+                  status: 'error',
+                  duration: 9000,
+                  isClosable: true,
+                });
               });
           }}
         >
@@ -117,6 +171,12 @@ function Register(): JSX.Element {
                 >
                   Submit
                 </Button>
+                <Flex>
+                  <Text fontSize="md" mr=".3rem">Already have an account?</Text>
+                  <Link color={colors.link} as={ReachLink} to="/login">
+                    <Text fontSize="md">Login</Text>
+                  </Link>
+                </Flex>
               </VStack>
             </Form>
           )}
